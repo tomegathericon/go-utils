@@ -1,0 +1,16 @@
+root = true
+
+[Makefie]
+
+indent_style = space
+indent_size = 2
+
+[*.mk]
+
+indent_style = space
+indent_size = 2
+
+[*.{yaml,yml,json,alloy}]
+
+indent_style = space
+indent_size = 2

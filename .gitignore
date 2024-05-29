@@ -1,0 +1,5 @@
+output
+*.logs
+.idea
+.vscode
+golang
