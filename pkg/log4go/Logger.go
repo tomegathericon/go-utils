@@ -9,10 +9,10 @@ import (
 
 func GetLogger() *zap.Logger {
 	config := zap.NewProductionEncoderConfig()
-	config.TimeKey = "t"
-	config.CallerKey = "c"
-	config.MessageKey = "m"
-	config.LevelKey = "l"
+	config.TimeKey = "T"
+	config.CallerKey = "C"
+	config.MessageKey = "M"
+	config.LevelKey = "L"
 	config.EncodeTime = zapcore.RFC3339TimeEncoder
 	config.EncodeCaller = zapcore.ShortCallerEncoder
 	logger := zap.New(zapcore.NewCore(zaplogfmt.NewEncoder(config), os.Stdout, zap.DebugLevel), zap.AddCaller())
