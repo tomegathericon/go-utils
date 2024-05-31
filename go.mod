@@ -1,4 +1,4 @@
-module github.com/tomegathericon/log4go
+module github.com/tomegathericon/go-utils
 
 go 1.22.3
 
