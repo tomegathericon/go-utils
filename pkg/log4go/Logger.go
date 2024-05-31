@@ -9,7 +9,11 @@ import (
 	"os"
 )
 
-func GetLogger() *zap.Logger {
+type Logger struct {
+	*zap.Logger
+}
+
+func NewLogger() *Logger {
 	config := zap.NewProductionEncoderConfig()
 	config.TimeKey = "T"
 	config.CallerKey = "C"
@@ -18,14 +22,16 @@ func GetLogger() *zap.Logger {
 	config.EncodeTime = zapcore.RFC3339TimeEncoder
 	config.EncodeCaller = zapcore.ShortCallerEncoder
 	logger := zap.New(zapcore.NewCore(zaplogfmt.NewEncoder(config), os.Stdout, zap.DebugLevel), zap.AddCaller())
-	return logger
+	return &Logger{
+		Logger: logger,
+	}
 }
 
-func GetLoggerWithOpenTelemetryTraces(ctx context.Context) *zap.Logger {
-	logger := GetLogger()
+func (l *Logger) WithOpenTelemetryTraces(ctx context.Context) *Logger {
 	fields := []zap.Field{
 		zap.String("traceID", trace.SpanFromContext(ctx).SpanContext().TraceID().String()),
 		zap.String("spanID", trace.SpanFromContext(ctx).SpanContext().SpanID().String()),
 	}
-	return logger.With(fields...)
+	l.Logger = l.Logger.With(fields...)
+	return l
 }
