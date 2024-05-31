@@ -27,6 +27,5 @@ func GetLoggerWithOpenTelemetryTraces(ctx context.Context) *zap.Logger {
 		zap.String("traceID", trace.SpanFromContext(ctx).SpanContext().TraceID().String()),
 		zap.String("spanID", trace.SpanFromContext(ctx).SpanContext().SpanID().String()),
 	}
-	logger.With(fields...)
-	return logger
+	return logger.With(fields...)
 }
