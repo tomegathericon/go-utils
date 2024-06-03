@@ -2,13 +2,14 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"go.opentelemetry.io/otel/trace"
+	"github.com/tomegathericon/go-utils/pkg/log4go"
 	"go.uber.org/zap"
 )
 
-func Middleware4Gin(log *zap.Logger, timeFormat string) gin.HandlerFunc {
+func Middleware(timeFormat string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
+		log := log4go.NewLogger()
 		fields := []zap.Field{
 			zap.String("path", c.Request.URL.Path),
 			zap.String("method", c.Request.Method),
@@ -19,9 +20,8 @@ func Middleware4Gin(log *zap.Logger, timeFormat string) gin.HandlerFunc {
 			zap.String("requestURI", c.Request.RequestURI),
 			zap.String("referer", c.Request.Referer()),
 			zap.String("remoteAddr", c.Request.RemoteAddr),
-			zap.String("traceID", trace.SpanFromContext(c.Request.Context()).SpanContext().TraceID().String()),
-			zap.String("spanID", trace.SpanFromContext(c.Request.Context()).SpanContext().SpanID().String()),
 		}
+		log = log.WithOpenTelemetryTraces(c.Request.Context())
 		log.Info(c.Request.URL.Path, fields...)
 	}
 }
