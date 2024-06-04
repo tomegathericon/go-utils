@@ -2,8 +2,10 @@ package tracer
 
 import (
 	"context"
+	"fmt"
 	"github.com/tomegathericon/go-utils/pkg/tracing4go/tracer/models"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 	"go.opentelemetry.io/otel/sdk/trace"
 	oteltrace "go.opentelemetry.io/otel/trace"
@@ -69,8 +71,7 @@ func NewHttpTraceProvider(cfg *models.TraceProviderConfig) *trace.TracerProvider
 	if httpExporterErr != nil {
 		log.Error(httpExporterErr.Error())
 	}
-	tp := trace.NewTracerProvider(trace.WithResource(resource), trace.WithSampler(trace.AlwaysSample()), trace.WithBatcher(httpExporter))
-	return tp
+	return trace.NewTracerProvider(trace.WithResource(resource), trace.WithSampler(trace.AlwaysSample()), trace.WithBatcher(httpExporter))
 }
 
 func (t *Tracer) StartTrace() {
@@ -82,6 +83,6 @@ func (t *Tracer) StartTrace() {
 }
 
 func (t *Tracer) EndTrace() {
-	t.Span().AddEvent(t.SpanName())
+	t.Span().AddEvent("log", oteltrace.WithAttributes(attribute.String("log.message", fmt.Sprintf("Span %s triggered", t.SpanName())), attribute.String("log.level", "info")))
 	defer t.Span().End()
 }
