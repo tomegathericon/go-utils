@@ -6,10 +6,9 @@ import (
 	"go.uber.org/zap"
 )
 
-func Middleware(timeFormat string) gin.HandlerFunc {
+func Middleware(log *log4go.Logger, timeFormat string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
-		log := log4go.NewLogger()
 		fields := []zap.Field{
 			zap.String("path", c.Request.URL.Path),
 			zap.String("method", c.Request.Method),

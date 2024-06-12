@@ -57,21 +57,21 @@ func (t *Tracer) SetSpanName(spanName string) {
 	t.spanName = spanName
 }
 
-func NewHttpTraceProvider(cfg *models.TraceProviderConfig) *trace.TracerProvider {
+func NewHttpTraceProvider(cfg *models.TraceProviderConfig) (*trace.TracerProvider, error) {
 	hostName, hostNameErr := os.Hostname()
 	if hostNameErr != nil {
-		log.Error(hostNameErr.Error())
+		return nil, hostNameErr
 	}
 	cfg.SetHostName(hostName)
 	resource, resourceErr := cfg.NewSDKResource()
 	if resourceErr != nil {
-		log.Error(resourceErr.Error())
+		return nil, resourceErr
 	}
 	httpExporter, httpExporterErr := otlptracehttp.New(context.Background())
 	if httpExporterErr != nil {
-		log.Error(httpExporterErr.Error())
+		return nil, httpExporterErr
 	}
-	return trace.NewTracerProvider(trace.WithResource(resource), trace.WithSampler(trace.AlwaysSample()), trace.WithBatcher(httpExporter))
+	return trace.NewTracerProvider(trace.WithResource(resource), trace.WithSampler(trace.AlwaysSample()), trace.WithBatcher(httpExporter)), nil
 }
 
 func (t *Tracer) StartTrace() {

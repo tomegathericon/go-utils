@@ -10,10 +10,12 @@ import (
 )
 
 type Logger struct {
+	config zapcore.EncoderConfig
 	*zap.Logger
+	zapcore.Core
 }
 
-func NewLogger() *Logger {
+func New() *Logger {
 	config := zap.NewProductionEncoderConfig()
 	config.TimeKey = "T"
 	config.CallerKey = "C"
@@ -21,17 +23,33 @@ func NewLogger() *Logger {
 	config.LevelKey = "L"
 	config.EncodeTime = zapcore.RFC3339TimeEncoder
 	config.EncodeCaller = zapcore.ShortCallerEncoder
-	logger := zap.New(zapcore.NewCore(zaplogfmt.NewEncoder(config), os.Stdout, zap.DebugLevel), zap.AddCaller())
 	return &Logger{
-		Logger: logger,
+		config: config,
+		Logger: nil,
+		Core:   nil,
 	}
 }
 
+func (l *Logger) JSON() *Logger {
+	l.Core = zapcore.NewCore(zapcore.NewJSONEncoder(l.config), os.Stdout, zap.DebugLevel)
+	l.Logger = zap.New(l.Core, zap.AddCaller())
+	return l
+
+}
+
+func (l *Logger) LogFmt() *Logger {
+	l.Core = zapcore.NewCore(zaplogfmt.NewEncoder(l.config), os.Stdout, zap.DebugLevel)
+	l.Logger = zap.New(l.Core, zap.AddCaller())
+	return l
+}
+
 func (l *Logger) WithOpenTelemetryTraces(ctx context.Context) *Logger {
+	traceID := trace.SpanFromContext(ctx).SpanContext().TraceID().String()
+	spanID := trace.SpanFromContext(ctx).SpanContext().SpanID().String()
 	fields := []zap.Field{
-		zap.String("traceID", trace.SpanFromContext(ctx).SpanContext().TraceID().String()),
-		zap.String("spanID", trace.SpanFromContext(ctx).SpanContext().SpanID().String()),
+		zap.String("traceID", traceID),
+		zap.String("spanID", spanID),
 	}
-	l.Logger = l.Logger.With(fields...)
+	*l.Logger = *zap.New(l.Core, zap.AddCaller()).With(fields...)
 	return l
 }

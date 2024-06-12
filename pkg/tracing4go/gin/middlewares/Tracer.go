@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/tomegathericon/go-utils/pkg/tracing4go/tracer"
-	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
+	"go.opentelemetry.io/otel/semconv/v1.17.0"
 )
 
 func OpenTelemetryTracing() gin.HandlerFunc {
