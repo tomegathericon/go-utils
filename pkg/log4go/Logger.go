@@ -2,20 +2,29 @@ package log4go
 
 import (
 	"context"
+	"fmt"
 	zaplogfmt "github.com/sykesm/zap-logfmt"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"regexp"
 )
 
 type Logger struct {
-	config zapcore.EncoderConfig
 	*zap.Logger
 	zapcore.Core
+	enc zapcore.Encoder
 }
 
-func New() *Logger {
+func New(format string) (*Logger, error) {
+	var enc zapcore.Encoder
+	regex := "(?i)(?:json|logfmt)"
+	re := regexp.MustCompile(regex)
+	logType := re.FindString(format)
+	if logType == "" {
+		return nil, fmt.Errorf("invalid log format: %s", format)
+	}
 	config := zap.NewProductionEncoderConfig()
 	config.TimeKey = "T"
 	config.CallerKey = "C"
@@ -23,22 +32,23 @@ func New() *Logger {
 	config.LevelKey = "L"
 	config.EncodeTime = zapcore.RFC3339TimeEncoder
 	config.EncodeCaller = zapcore.ShortCallerEncoder
+	switch logType {
+	case "json":
+		enc = zapcore.NewJSONEncoder(config)
+		break
+	case "logfmt":
+		enc = zaplogfmt.NewEncoder(config)
+		break
+	}
 	return &Logger{
-		config: config,
 		Logger: nil,
 		Core:   nil,
-	}
+		enc:    enc,
+	}, nil
 }
 
-func (l *Logger) JSON() *Logger {
-	l.Core = zapcore.NewCore(zapcore.NewJSONEncoder(l.config), os.Stdout, zap.DebugLevel)
-	l.Logger = zap.New(l.Core, zap.AddCaller())
-	return l
-
-}
-
-func (l *Logger) LogFmt() *Logger {
-	l.Core = zapcore.NewCore(zaplogfmt.NewEncoder(l.config), os.Stdout, zap.DebugLevel)
+func (l *Logger) Create() *Logger {
+	l.Core = zapcore.NewCore(l.enc, os.Stdout, zap.DebugLevel)
 	l.Logger = zap.New(l.Core, zap.AddCaller())
 	return l
 }
