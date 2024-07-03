@@ -1,4 +1,4 @@
-package log4go
+package log
 
 import (
 	"context"

@@ -3,7 +3,7 @@ package tracer
 import (
 	"context"
 	"fmt"
-	"github.com/tomegathericon/go-utils/pkg/tracing4go/tracer/models"
+	"github.com/tomegathericon/go-utils/pkg/tracing/tracer/models"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"

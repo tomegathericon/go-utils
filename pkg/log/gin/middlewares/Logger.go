@@ -2,11 +2,11 @@ package middlewares
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/tomegathericon/go-utils/pkg/log4go"
+	"github.com/tomegathericon/go-utils/pkg/log"
 	"go.uber.org/zap"
 )
 
-func Middleware(log *log4go.Logger, timeFormat string) gin.HandlerFunc {
+func Middleware(log *log.Logger, timeFormat string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Next()
 		fields := []zap.Field{
