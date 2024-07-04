@@ -47,12 +47,21 @@ func New(format string) (*Logger, error) {
 	}, nil
 }
 
-func Must() *Logger {
-	log, err := New("json")
+func Must(format string) *Logger {
+	log, err := New(format)
 	if err != nil {
 		panic(err)
 	}
 	return log
+}
+
+func (l *Logger) NewContext(ctx context.Context) context.Context {
+	return context.WithValue(ctx, "logger", l)
+}
+
+func FromContext(ctx context.Context) *Logger {
+	c, _ := ctx.Value("logger").(*Logger)
+	return c
 }
 
 func (l *Logger) Create() *Logger {

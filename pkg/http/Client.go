@@ -31,7 +31,7 @@ func (c *Client) SetLog(log *log.Logger) {
 func NewClient() *Client {
 	return &Client{
 		httpClient: &http.Client{},
-		log:        log.Must(),
+		log:        log.Must("json"),
 	}
 }
 
