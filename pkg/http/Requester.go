@@ -2,6 +2,6 @@ package http
 
 import "net/http"
 
-type Rester interface {
+type Rest interface {
 	GET() (*http.Response, error)
 }

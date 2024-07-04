@@ -47,6 +47,14 @@ func New(format string) (*Logger, error) {
 	}, nil
 }
 
+func Must() *Logger {
+	log, err := New("json")
+	if err != nil {
+		panic(err)
+	}
+	return log
+}
+
 func (l *Logger) Create() *Logger {
 	l.Core = zapcore.NewCore(l.enc, os.Stdout, zap.DebugLevel)
 	l.Logger = zap.New(l.Core, zap.AddCaller())

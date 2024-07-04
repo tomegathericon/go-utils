@@ -12,8 +12,16 @@ type Client struct {
 	url        *url.URL
 	body       io.Reader
 	httpClient *http.Client
-	headers    map[string]string
+	headers    http.Header
 	log        *log.Logger
+}
+
+func (c *Client) Headers() http.Header {
+	return c.headers
+}
+
+func (c *Client) SetHeaders(headers http.Header) {
+	c.headers = headers
 }
 
 func (c *Client) SetLog(log *log.Logger) {
@@ -23,6 +31,7 @@ func (c *Client) SetLog(log *log.Logger) {
 func NewClient() *Client {
 	return &Client{
 		httpClient: &http.Client{},
+		log:        log.Must(),
 	}
 }
 
@@ -42,23 +51,13 @@ func (c *Client) SetBody(body io.Reader) {
 	c.body = body
 }
 
-func (c *Client) Headers() map[string]string {
-	return c.headers
-}
-
-func (c *Client) SetHeaders(headers map[string]string) {
-	c.headers = headers
-}
-
 func (c *Client) GET() (*http.Response, error) {
 	req, err := http.NewRequest("GET", c.url.String(), nil)
 	if err != nil {
 		return nil, err
 	}
 	if c.headers != nil {
-		for k, v := range c.headers {
-			req.Header.Set(k, v)
-		}
+		req.Header = c.headers
 	}
 	res, err := c.httpClient.Do(req)
 	if err != nil {
