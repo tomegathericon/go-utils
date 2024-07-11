@@ -1,14 +1,22 @@
 package middlewares
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/tomegathericon/go-utils/pkg/log"
 	"go.uber.org/zap"
 )
 
-func Middleware(log *log.Logger, timeFormat string) gin.HandlerFunc {
+func Middleware(ctx context.Context) gin.HandlerFunc {
+	var dc context.Context
 	return func(c *gin.Context) {
-		c.Next()
+		if ctx == nil {
+			cc, ok := c.Get("oc")
+			if !ok {
+				panic("no oc context")
+			}
+			dc = cc.(context.Context)
+		}
 		fields := []zap.Field{
 			zap.String("path", c.Request.URL.Path),
 			zap.String("method", c.Request.Method),
@@ -20,7 +28,8 @@ func Middleware(log *log.Logger, timeFormat string) gin.HandlerFunc {
 			zap.String("referer", c.Request.Referer()),
 			zap.String("remoteAddr", c.Request.RemoteAddr),
 		}
-		log = log.WithOpenTelemetryTraces(c.Request.Context())
-		log.Info(c.Request.URL.Path, fields...)
+		l := log.FromContext(dc)
+		l.WithOpenTelemetryTraces(c.Request.Context()).Info(c.Request.URL.Path, fields...)
+		c.Next()
 	}
 }

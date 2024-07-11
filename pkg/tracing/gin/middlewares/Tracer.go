@@ -1,21 +1,20 @@
 package middlewares
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/tomegathericon/go-utils/pkg/tracing/tracer"
-	"go.opentelemetry.io/otel/semconv/v1.17.0"
+	"github.com/tomegathericon/go-utils/pkg/tracing/models"
 )
 
-func OpenTelemetryTracing() gin.HandlerFunc {
+func OpenTelemetryTracing(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		t := tracer.NewTracer()
-		t.SetSpanName(c.FullPath())
-		t.SetContext(c.Request.Context())
-		t.StartTrace()
-		t.Span().SetAttributes(semconv.HTTPStatusCode(c.Writer.Status()))
-		t.Span().SetAttributes(semconv.HTTPRoute(c.FullPath()))
-		t.EndTrace()
-		c.Request = c.Request.WithContext(t.Context())
+		c.Set("oc", ctx)
+		h := models.NewHttpTracer()
+		h.SetStatus(c.Writer.Status())
+		h.SetRoute(c.FullPath())
+		h.SetContext(c.Request.Context())
+		h.Start()
+		c.Request = c.Request.WithContext(h.Context())
 		c.Next()
 	}
 }

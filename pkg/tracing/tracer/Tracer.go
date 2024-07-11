@@ -3,7 +3,6 @@ package tracer
 import (
 	"context"
 	"fmt"
-	"github.com/tomegathericon/go-utils/pkg/tracing/tracer/models"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -57,7 +56,7 @@ func (t *Tracer) SetSpanName(spanName string) {
 	t.spanName = spanName
 }
 
-func NewHttpTraceProvider(cfg *models.TraceProviderConfig) (*trace.TracerProvider, error) {
+func NewHttpTraceProvider(cfg *TraceProviderConfig) (*trace.TracerProvider, error) {
 	hostName, hostNameErr := os.Hostname()
 	if hostNameErr != nil {
 		return nil, hostNameErr
