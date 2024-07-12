@@ -16,6 +16,10 @@ func NewTraceProviderConfig() *TraceProviderConfig {
 	}
 }
 
+func (pc *TraceProviderConfig) NewContext() context.Context {
+	return context.WithValue(context.Background(), "tpc", pc)
+}
+
 type otelResource struct {
 	serviceName, serviceVersion, hostName string
 }
