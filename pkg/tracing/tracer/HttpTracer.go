@@ -1,14 +1,13 @@
-package models
+package tracer
 
 import (
-	"github.com/tomegathericon/go-utils/pkg/tracing/tracer"
 	semconv "go.opentelemetry.io/otel/semconv/v1.25.0"
 )
 
 type HttpTracer struct {
 	route  string
 	status int
-	*tracer.Tracer
+	*Tracer
 }
 
 func (h *HttpTracer) Status() int {
@@ -29,7 +28,7 @@ func (h *HttpTracer) SetRoute(route string) {
 
 func NewHttpTracer() *HttpTracer {
 	return &HttpTracer{
-		Tracer: tracer.NewTracer(),
+		Tracer: NewTracer(),
 	}
 }
 
