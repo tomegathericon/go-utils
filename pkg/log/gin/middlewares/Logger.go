@@ -8,7 +8,7 @@ import (
 )
 
 func Middleware(ctx context.Context) gin.HandlerFunc {
-	var dc context.Context
+	dc := ctx
 	return func(c *gin.Context) {
 		if ctx == nil {
 			cc, ok := c.Get("oc")
