@@ -16,8 +16,12 @@ func NewTraceProviderConfig() *TraceProviderConfig {
 	}
 }
 
-func (pc *TraceProviderConfig) NewContext() context.Context {
-	return context.WithValue(context.Background(), "tpc", pc)
+func (pc *TraceProviderConfig) NewContext(ctx context.Context) context.Context {
+	return context.WithValue(ctx, "tpc", pc)
+}
+
+func (pc *TraceProviderConfig) MustContext() context.Context {
+	return pc.NewContext(context.Background())
 }
 
 type otelResource struct {

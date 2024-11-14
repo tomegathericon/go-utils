@@ -2,13 +2,11 @@ package log
 
 import (
 	"context"
-	"fmt"
 	zaplogfmt "github.com/sykesm/zap-logfmt"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
-	"regexp"
 )
 
 type Logger struct {
@@ -17,14 +15,8 @@ type Logger struct {
 	enc zapcore.Encoder
 }
 
-func New(format string) (*Logger, error) {
+func New(format LogFormat) (*Logger, error) {
 	var enc zapcore.Encoder
-	regex := "(?i)(?:json|logfmt)"
-	re := regexp.MustCompile(regex)
-	logType := re.FindString(format)
-	if logType == "" {
-		return nil, fmt.Errorf("invalid log format: %s", format)
-	}
 	config := zap.NewProductionEncoderConfig()
 	config.TimeKey = "T"
 	config.CallerKey = "C"
@@ -32,7 +24,7 @@ func New(format string) (*Logger, error) {
 	config.LevelKey = "L"
 	config.EncodeTime = zapcore.RFC3339TimeEncoder
 	config.EncodeCaller = zapcore.ShortCallerEncoder
-	switch logType {
+	switch format {
 	case "json":
 		enc = zapcore.NewJSONEncoder(config)
 		break
@@ -47,7 +39,7 @@ func New(format string) (*Logger, error) {
 	}, nil
 }
 
-func Must(format string) *Logger {
+func Must(format LogFormat) *Logger {
 	log, err := New(format)
 	if err != nil {
 		panic(err)
