@@ -34,7 +34,7 @@ func NewServer() {
 	router.Use(middlewares.Middleware(nil))
 	router.GET(os.Getenv("DEFAULT_ROUTE"), func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "I AM ALIVE!!!!!",
+			"message": os.Getenv("DEFAULT_ROUTE_MESSAGE"),
 			"code":    http.StatusOK,
 		})
 	})
