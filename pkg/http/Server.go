@@ -15,12 +15,16 @@ import (
 )
 
 func NewServer() {
-	l := log.Must(log.LOGFMT).Create()
-	ctx := l.NewContext(context.Background())
-	err := config.Load(ctx)
+	err := config.Load(context.Background())
 	if err != nil {
 		panic(err)
 	}
+	lf, lfErr := log.GetFormat(os.Getenv("LOG_FORMAT"))
+	if lfErr != nil {
+		panic(lfErr)
+	}
+	l := log.Must(lf).Create()
+	ctx := l.NewContext(context.Background())
 	tpc := tracer.NewTraceProviderConfig()
 	tpc.SetServiceName(os.Getenv("SERVICE_NAME"))
 	tpc.SetServiceVersion(os.Getenv("SERVICE_VERSION"))
